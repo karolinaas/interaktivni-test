@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktivní test</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #880e4f;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #2d2d2d;
+        }
+        .options {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            width: 48%;
+        }
+        .options label:hover {
+            background-color: #3e3e3e;
+        }
+        .option-image {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #880e4f;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 48%;
+        }
+        button:hover {
+            background-color: #5e1d46;
+        }
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        .correct {
+            border: 2px solid #4caf50;
+        }
+        .incorrect {
+            border: 2px solid #f44336;
+        }
+        .navigation {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .stats {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+        audio {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .submit-button {
+            display: flex;
+            justify-content: center;
+        }
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interaktivní test</h1>
+        <div id="quizForm"></div>
+        <div id="stats" class="stats"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Jaká je hlavní město Francie?",
+                options: ["Berlín", "Madrid", "Paříž", "Řím"],
+                answer: "Paříž"
+            },
+            {
+                question: "Jaký je nejvyšší vrchol světa?",
+                options: ["K2", "Mount Everest", "Kangchenjunga", "Lhotse"],
+                answer: "Mount Everest"
+            },
+            {
+                question: "Který z níže uvedených obrázků má houslový klíč?",
+                images: ["obrazek1.jpg", "obrazek2.jpg", "obrazek3.jpg", "obrazek4.jpg"],
+                answer: "obrazek2.jpg"
+            },
+            {
+                question: "Jaký zvuk slyšíte?",
+                audio: "zvuk.mp3",
+                options: ["Ptačí zpěv", "Šumění moře", "Zvuk deště", "Zvuk větru"],
+                answer: "Ptačí zpěv"
+            },
+            {
+                question: "Jaký je tento hudební nástroj?",
+                questionImage: "nastroj.jpg",
+                options: ["Kytara", "Klavír", "Housle", "Flétna"],
+                answer: "Housle"
+            },
+            {
+                question: "Které z těchto zvířat je savec?",
+                options: ["Pštros", "Želva", "Krokodýl", "Velryba"],
+                answer: "Velryba"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+        let userAnswers = [];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleOptions(options) {
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+            const shuffledOptions = shuffleArray([...options]);
+            return shuffledOptions.map((option, index) => ({
+                letter: letters[index],
+                value: option
+            }));
+        }
+
+        function startQuiz() {
+            shuffledQuestions = shuffleArray([...questions]);
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = new Array(shuffledQuestions.length).fill(null);
+            showQuestion(shuffledQuestions[currentQuestionIndex]);
+            updateStats();
+        }
+
+        function showQuestion(question) {
+            const quizForm = document.getElementById("quizForm");
+            let optionsHTML = '';
+
+            if (question.options) {
+                const shuffledOptions = shuffleOptions([...question.options]);
+                optionsHTML = shuffledOptions.map(option => {
+                    const isSelected = userAnswers[currentQuestionIndex] === option.value;
+                    const isCorrect = option.value === question.answer;
+                    const isIncorrect = userAnswers[currentQuestionIndex] !== null && userAnswers[currentQuestionIndex] !== question.answer && userAnswers[currentQuestionIndex] === option.value;
+
+                    let className = '';
+                    if (userAnswers[currentQuestionIndex] !== null) {
+                        if (isCorrect) {
+                            className = 'correct';
+                        } else if (isIncorrect) {
+                            className = 'incorrect';
+                        }
+                    }
+
+                    return `<label class="${className}"><input type="radio" name="answer" value="${option.value}" ${isSelected ? 'checked' : ''} ${userAnswers[currentQuestionIndex] !== null ? 'disabled' : ''}> ${option.letter}. ${option.value}</label>`;
+                }).join('');
+            } else if (question.images) {
+                const shuffledImages = shuffleArray([...question.images]);
+                const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+                optionsHTML = shuffledImages.map((image, index) => {
+                    const isSelected = userAnswers[currentQuestionIndex] === image;
+                    const isCorrect = image === question.answer;
+                    const isIncorrect = userAnswers[currentQuestionIndex] !== null && userAnswers[currentQuestionIndex] !== question.answer && userAnswers[currentQuestionIndex] === image;
+
+                    let className = '';
+                    if (userAnswers[currentQuestionIndex] !== null) {
+                        if (isCorrect) {
+                            className = 'correct';
+                        } else if (isIncorrect) {
+                            className = 'incorrect';
+                        }
+                    }
+
+                    return `<label class="${className}"><input type="radio" name="answer" value="${image}" ${isSelected ? 'checked' : ''} ${userAnswers[currentQuestionIndex] !== null ? 'disabled' : ''}> ${letters[index]}. <img src="${image}" alt="Obrázek" class="option-image"></label>`;
+                }).join('');
+            }
+
+            quizForm.innerHTML = `
+                <div class="question">
+                    <h3>${currentQuestionIndex + 1}. ${question.question}</h3>
+                    ${question.questionImage ? `<img src="${question.questionImage}" alt="Obrázek v otázce" class="question-image">` : ''}
+                    ${question.image ? `<img src="${question.image}" alt="Obrázek">` : ''}
+                    ${question.audio ? `<audio controls><source src="${question.audio}" type="audio/mpeg">Váš prohlížeč nepodporuje audio element.</audio>` : ''}
+                    <div class="options">
+                        ${optionsHTML}
+                    </div>
+                    ${userAnswers[currentQuestionIndex] === null ? `<div class="submit-button"><button type="button" onclick="submitAnswer()">Odeslat odpověď</button></div>` : ''}
+                    ${userAnswers[currentQuestionIndex] !== null ? `<div class="feedback">${userAnswers[currentQuestionIndex] === question.answer ? 'Správná odpověď' : 'Špatná odpověď'}</div>` : ''}
+                </div>
+                <div class="navigation">
+                    <button type="button" onclick="prevQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''}>Předchozí otázka</button>
+                    <button type="button" onclick="nextQuestion()" ${currentQuestionIndex === shuffledQuestions.length - 1 ? 'disabled' : ''}>Další otázka</button>
+                </div>
+            `;
+        }
+
+        function submitAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                userAnswers[currentQuestionIndex] = selectedOption.value;
+                if (selectedOption.value === shuffledQuestions[currentQuestionIndex].answer) {
+                    score++;
+                }
+                showQuestion(shuffledQuestions[currentQuestionIndex]);
+                updateStats();
+            } else {
+                alert("Prosím, vyberte odpověď.");
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion(shuffledQuestions[currentQuestionIndex]);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < shuffledQuestions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion(shuffledQuestions[currentQuestionIndex]);
+            }
+        }
+
+        function updateStats() {
+            const statsDiv = document.getElementById("stats");
+            const totalQuestions = shuffledQuestions.length;
+            statsDiv.innerHTML = `
+                <p>Správné odpovědi: ${score} z ${totalQuestions}</p>
+            `;
+        }
+
+        startQuiz();
+    </script>
+</body>
+</html>
