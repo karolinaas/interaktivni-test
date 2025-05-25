@@ -26,7 +26,7 @@
         }
         h1 {
             text-align: center;
-            color: #880e4f;
+            color: #9F1D35;
         }
         .question {
             margin-bottom: 20px;
@@ -61,7 +61,7 @@
         button {
             margin-top: 10px;
             padding: 10px 20px;
-            background-color: #880e4f;
+            background-color: #800020;
             color: #ffffff;
             border: none;
             border-radius: 4px;
@@ -70,7 +70,7 @@
             width: 48%;
         }
         button:hover {
-            background-color: #5e1d46;
+            background-color: #660019;
         }
         button:disabled {
             background-color: #555;
@@ -127,42 +127,9 @@
         <div id="stats" class="stats"></div>
     </div>
 
-    <script>
-        const questions = [
-            {
-                question: "Jaká je hlavní město Francie?",
-                options: ["Berlín", "Madrid", "Paříž", "Řím"],
-                answer: "Paříž"
-            },
-            {
-                question: "Jaký je nejvyšší vrchol světa?",
-                options: ["K2", "Mount Everest", "Kangchenjunga", "Lhotse"],
-                answer: "Mount Everest"
-            },
-            {
-                question: "Který z níže uvedených obrázků má houslový klíč?",
-                images: ["obrazek1.jpg", "obrazek2.jpg", "obrazek3.jpg", "obrazek4.jpg"],
-                answer: "obrazek2.jpg"
-            },
-            {
-                question: "Jaký zvuk slyšíte?",
-                audio: "zvuk.mp3",
-                options: ["Ptačí zpěv", "Šumění moře", "Zvuk deště", "Zvuk větru"],
-                answer: "Ptačí zpěv"
-            },
-            {
-                question: "Jaký je tento hudební nástroj?",
-                questionImage: "nastroj.jpg",
-                options: ["Kytara", "Klavír", "Housle", "Flétna"],
-                answer: "Housle"
-            },
-            {
-                question: "Které z těchto zvířat je savec?",
-                options: ["Pštros", "Želva", "Krokodýl", "Velryba"],
-                answer: "Velryba"
-            }
-        ];
+    <script src="questions.js"></script>
 
+    <script>
         let currentQuestionIndex = 0;
         let score = 0;
         let shuffledQuestions = [];
